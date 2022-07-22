@@ -7,69 +7,43 @@ import {
     Button,
     StyleSheet,
     ActivityIndicator,
-    useWindowDimensions,
 	Alert
 } from 'react-native';
 import {useWebSocket} from 'react-use-websocket/dist/lib/use-websocket';
-import  {ACTION, DESTINATION, ORIGIN, ROLE} from "./tridget_constants.js";
+import  {ACTION, DESTINATION, ORIGIN, ROLE} from "../tridget_constants.js";
 
-const socketUrl = "ws://192.168.0.167:8080";
-
-const SignIn = () => {
-    const window = useWindowDimensions();
-
-	const [name,
-		setName] = useState("");
-
-    const [connected,
-        setConnected] = useState(false);
-	const [nameSubmitted,
-		setNameSubmitted] = useState(false);
-	const [nameApproved,
-		setNameApproved] = useState(false);
-	const [receivedPacket, 
-		setReceivedPacket] = useState({});
-
-    const {
-        sendMessage,
-        sendJsonMessage,
-        lastMessage,
-        lastJsonMessage,
-        readyState,
-        getWebSocket
-    } = useWebSocket(socketUrl, {
-        onOpen: () => {
-            console.log('opened');
-            setConnected(true)
-        },
-        //Will attempt to reconnect on all close events, such as server shutting down
-        shouldReconnect: (closeEvent) => true
-    });
+const SignIn = (props) => {
 
 
 	useEffect(() => {
-		console.log(lastMessage);
-		
-	},[lastMessage]);
+		var packet = props.ws.lastJsonMessage;
+		if (!packet) {
+			return;
+		}
+		if (packet.action == ACTION.CONFIRM_NAME) {
+			console.log(packet.payload.confirmedName, "confirmed");
+			props.ws.setNameApproved(true);
 
-	const submitHandler = useCallback(() => {
-		if (name.trim().length == 0) {
+		}
+	},[props.lastJsonMessage]);
+
+	const submitHandler = () => {
+		if (props.teamName.trim().length == 0) {
 			Alert.alert("Name must be entered...");
-			return
+			
+			return;
 		}
 		var askPacket = {
 			to: DESTINATION.GAME_MASTER,
 			from: ORIGIN.PLAYER,
 			action: ACTION.ENTER_GAME,
 			payload: {
-				proposedName: name
+				proposedName: props.teamName
 			}
 		}
 		console.log(askPacket);
-		sendMessage(JSON.stringify(askPacket));
-	},[]);
-
-
+		props.ws.sendMessage(JSON.stringify(askPacket));
+	};
 
     return (
         <View
@@ -98,20 +72,14 @@ const SignIn = () => {
                 flex: 1,
                 alignItems: "center"
             }}>
-                <TextInput style={styles.inputBox}  onChangeText={(evt) => setName(evt)}/>
+                <TextInput style={styles.inputBox}  onChangeText={newText => props.setTeamName(newText)}/>
                 <Text style={styles.promptText}>Enter Team Name</Text>
             </View>
             <View style={styles.promptView}>
                 <Button title="Submit" style="styles.submitButton" color="#444" onPress={submitHandler}/>
             </View>
-            <View style={styles.connectionMessageView}>
-                {connected
-                    ? <Text style={styles.connectionMessage}>Connected</Text>
-                    : <ActivityIndicator size="large" color="white"/>}
-            </View>
-			<View style={styles.status}>
-				<Text style={styles.statusText}>{lastMessage ? lastMessage.data: ""}</Text>
-			</View>
+  
+
 
         </View>
     );
