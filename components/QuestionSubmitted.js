@@ -3,17 +3,15 @@ import {
     View,
 	Text,
     StyleSheet,
-    ActivityIndicator,
-	Image
+    ActivityIndicator
 } from 'react-native';
-import RadioButtons from './NativeComponents/RadioButtons.js';
 
-const Waiting = (props) => {
+const QuestionSubmitted = (props) => {
     return (
         <View style={styles.mainScreen}>
-
+			<Text style={styles.messageText}>Question Submitted</Text>
 			<ActivityIndicator size="large" color="#FFFFFF"/><br/>
-			<Text style={styles.messageText}>{props.message}</Text>
+			<Text style={styles.messageText}>Waiting...</Text>
         </View>
     );
 }
@@ -30,4 +28,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default Waiting;
+export default QuestionSubmitted;

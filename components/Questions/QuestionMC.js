@@ -2,7 +2,7 @@ import React, {useState} from 'react';
 import {View, Text, StyleSheet, Pressable, Button} from 'react-native';
 import RadioButtons from '../NativeComponents/RadioButtons';
 
-const QuestionTF = (props) => {
+const QuestionMC = (props) => {
 
     const [answer,
         setAnswer] = useState(null);
@@ -18,20 +18,18 @@ const QuestionTF = (props) => {
 		props.setQuestionComplete(true);
 	}
 
+	var opts = [];
+	for (let option of props.question.choices) {
+		opts.push({text: option, value: option})
+	}
+
+
     return (
         <View style={styles.mainScreen}>
             <Text style={styles.messageText}>{props.question.prompt}</Text><br/>
             <View style={styles.buttonContainer}>
                 <RadioButtons
-                    options={[
-                    {
-                        text: "True",
-                        value: true
-                    }, {
-                        text: "False",
-                        value: false
-                    }
-                ]}
+                    options={opts}
                 layout="column"
 				setAnswer={setAnswer}/>
             </View>
@@ -54,7 +52,7 @@ const styles = StyleSheet.create({
         color: "white",
         fontSize: "30px",
         fontWeight: "bold",
-		marginLeft: 20
+		marginLeft: 15
     },
     buttonContainer: {
         flexDirection: "row"
@@ -73,4 +71,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default QuestionTF;
+export default QuestionMC;

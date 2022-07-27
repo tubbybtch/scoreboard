@@ -6,12 +6,13 @@ import {v4 as uuid} from 'uuid';
 
 
 const RadioButtons = (props) => {
-    console.log(props);
+    //console.log(props);
     const [answer,
         setAnswer] = useState(null);
 
     const onSelect = (value) => {
         setAnswer(value);
+		props.setAnswer(value);
     }
 
     return (
@@ -24,7 +25,7 @@ const RadioButtons = (props) => {
                             text={opt.text}
                             value={opt.value}
                             selected={answer == opt.value ? true : false}
-                            onSelect={setAnswer}
+                            onSelect={onSelect}
 							key={uuid()}/>
                     })}
 
@@ -54,7 +55,7 @@ const styles = StyleSheet.create({
         backgroundColor: "white"
     },
     buttonText: {
-        color: "grey",
+        color: "white",
         fontSize: "30px",
         fontWeight: "bold",
         justifyContent: "center"

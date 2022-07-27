@@ -23,8 +23,8 @@
     "react-native-dynamic-vector-icons": "^1.2.0",
     "react-native-helpers": "^0.0.2",
     "react-native-linear-gradient": "^2.6.2",
+    "react-native-svg": "^12.4.0",
     "react-native-svg-transformer": "^1.0.0",
-    "react-native-vector-icons": "^9.2.0",
     "react-native-web": "0.17.7",
     "react-use-websocket": "^4.2.0"
   },

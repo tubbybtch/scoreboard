@@ -1,12 +1,11 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Pressable} from 'react-native';
-import { FontAwesomeIcon } from '@fortawesome/react-native-fontawesome';
-import { faMugSaucer } from '@fortawesome/free-solid-svg-icons';
+import {View, Text, StyleSheet, Pressable, Image} from 'react-native';
 
 const tfButtons = ["True", "False"];
 
 const RadioButton = (props) => {
-
+	const unchecked = <Image source={require("./radio-unchecked.png")} style={styles.tinyIcon}/>;
+	const checked = <Image source={require("./radio-checked.png")} style={styles.tinyIcon}/>;
     const onSelect = (index, value) => {
         props.onSelect(props.value);
     }
@@ -14,8 +13,7 @@ const RadioButton = (props) => {
     return (
         <Pressable onPress={onSelect}>
             <View style={styles.container}>
-				<FontAwesomeIcon icon={faMugSaucer} />
-                <View style={props.selected ? styles.buttonSelected : styles.button}></View>
+				{props.selected ? checked : unchecked}
                 <Text style={props.selected ? styles.buttonTextSelected : styles.buttonText}>{props.text}</Text >
             </View>
         </Pressable>
@@ -49,7 +47,7 @@ const styles = StyleSheet.create({
 		marginBottom: 15
     },
     buttonText: {
-        color: "lightgrey",
+        color: "white",
         fontSize: "30px",
         fontWeight: "bold",
         justifyContent: "center",
@@ -63,7 +61,12 @@ const styles = StyleSheet.create({
         justifyContent: "center",
 		marginLeft: 10,
 		marginRight: 20
-    }
+    },
+	tinyIcon: {
+		width: 50,
+		height: 50,
+		margin: 2
+	}
 });
 
 export default RadioButton;
