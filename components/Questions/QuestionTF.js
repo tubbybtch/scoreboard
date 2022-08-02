@@ -13,8 +13,8 @@ const QuestionTF = (props) => {
 
 	const submitAnswer = () => {
 		console.log("submitted:",answer);
-		setAnswer(answer);
-		props.setAnswer(answer);
+		setAnswer((""+answer).toUpperCase());
+		props.setAnswer((""+answer).toUpperCase());
 		props.setQuestionComplete(true);
 	}
 
@@ -23,7 +23,7 @@ const QuestionTF = (props) => {
             <Text style={styles.messageText}>{props.question.prompt}</Text><br/>
             <View style={styles.buttonContainer}>
                 <RadioButtons
-                    options={[
+                    options={[ 
                     {
                         text: "True",
                         value: true

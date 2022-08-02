@@ -6,12 +6,12 @@ import {
     ActivityIndicator
 } from 'react-native';
 
-const QuestionSubmitted = (props) => {
+const AnswerSubmitted = (props) => {
+	console.log(props);
     return (
         <View style={styles.mainScreen}>
-			<Text style={styles.messageText}>Question Submitted</Text>
+			<Text style={styles.messageText}>Answer Submitted</Text>
 			<ActivityIndicator size="large" color="#FFFFFF"/><br/>
-			<Text style={styles.messageText}>Waiting...</Text>
         </View>
     );
 }
@@ -28,4 +28,4 @@ const styles = StyleSheet.create({
     }
 });
 
-export default QuestionSubmitted;
+export default AnswerSubmitted;

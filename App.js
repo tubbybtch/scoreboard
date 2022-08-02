@@ -63,7 +63,7 @@ const App = () => {
     } else if (waiting) {
 		content = <Waiting message="Waiting..."/>
 	} else if (displayQuestion) {
-		content = <Question question={question}/>
+		content = <Question question={question} teamName={teamName} socket={ws} />
 	}
 
     return (
