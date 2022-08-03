@@ -1,9 +1,16 @@
 import React, {useState} from 'react';
-import {View, Text, StyleSheet, Pressable, Button} from 'react-native';
+import {
+    View,
+    Text,
+    StyleSheet,
+    Pressable,
+    Button,
+    TextInput
+} from 'react-native';
 import RadioButtons from '../NativeComponents/RadioButtons';
 
-const QuestionTF = (props) => {
-
+const QuestionFillIn = (props) => {
+    console.log(props);
     const [answer,
         setAnswer] = useState(null);
 
@@ -18,30 +25,24 @@ const QuestionTF = (props) => {
         props.setQuestionComplete(true);
     }
 
+    if (!props.question.numberLinesInAnswer) 
+        props.question.numberLinesInAnswer = 1;
+    
     return (
         <View style={styles.mainScreen}>
-            <Text style={styles.messageText}>{props.question.prompt}<br/></Text>
+            <Text style={styles.messageText}>{props.question.prompt}</Text><br/>
             <View style={styles.buttonContainer}>
-                <RadioButtons
-                    options={[
-                    {
-                        text: "True",
-                        value: true
-                    }, {
-                        text: "False",
-                        value: false
-                    }
-                ]}
-                    layout="column"
-                    setAnswer={setAnswer}/>
+                <TextInput
+                    onChangeText={setAnswer}
+                    style={styles.inputBox}
+                    multiline={true}
+                    numberOfLines={props.question.numberLinesInAnswer}/>
             </View>
-            <View>
-                <Text><br/><br/></Text>
+            <View style={styles.submitButtonView}>
                 {answer !== null
                     ? <Button onPress={submitAnswer} title="Submit" color="black"/>
                     : null}
             </View>
-
         </View>
     );
 }
@@ -62,7 +63,7 @@ const styles = StyleSheet.create({
         flexDirection: "row"
     },
     button: {
-        height: 80,
+        height: 50,
         width: 150,
         margin: 10,
         backgroundColor: "white"
@@ -72,7 +73,19 @@ const styles = StyleSheet.create({
         fontSize: "30px",
         fontWeight: "bold",
         justifyContent: "center"
-    }
+    },
+    inputBox: {
+        backgroundColor: "white",
+        fontSize: "30px",
+        fontWeight: "bold",
+        borderColor: 'gray',
+        borderWidth: 1,
+        width: "100%",
+        align: "center"
+    },
+	submitButtonView: {
+		paddingTop: 70,
+	}
 });
 
-export default QuestionTF;
+export default QuestionFillIn;

@@ -76,12 +76,9 @@ const SignIn = (props) => {
                 <Text style={styles.promptText}>Enter Team Name</Text>
             </View>
             <View style={styles.promptView}>
-                <Button title="Submit" style="styles.submitButton" color="#444" onPress={submitHandler}/>
+                <br/><Button title="Submit" style="styles.submitButton" color="#444" onPress={submitHandler}/>
             </View>
-  
-
-
-        </View>
+         </View>
     );
 }
 
@@ -108,6 +105,7 @@ const styles = StyleSheet.create({
     },
     promptView: {
         flex: 1,
+		paddingTop: 75,
     },
     promptText: {
         color: "white",
@@ -125,7 +123,6 @@ const styles = StyleSheet.create({
         height: "50px"
     },
     submitButton: {
-        backgroundColor: "red",
         fontSize: "40px",
 		padding: 50
     },
@@ -144,6 +141,9 @@ const styles = StyleSheet.create({
 	statusText: {
 		color: "white",
 		fontSize: 25
+	},
+	submitButtonView: {
+		paddingTop: 70,
 	}
 });
 

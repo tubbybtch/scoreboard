@@ -8,7 +8,7 @@ import Question from "./components/Questions/Question.js"
 import {ACTION, DESTINATION, ORIGIN, ROLE, QUESTION_TYPE} from './tridget_constants.js';
 //import {ACTION, DESTINATION, ORIGIN, ROLE, QUESTION_TYPE} from 'https://github.com/tubbybtch/tridget2_constants/blob/48d97c4438aae2b451e0381a75d59f81af9d9236/tridget_constants.js';
 
-const socketUrl = "ws://192.168.0.167:8080";
+const socketUrl = "ws://192.168.0.167:10437";
 
 const App = () => {
     const [connected,
@@ -37,6 +37,7 @@ const App = () => {
 
     useEffect(() => {
         // will execute on every new packet received
+		console.log(ws.lastJsonMessage);
         if (ws.lastJsonMessage) {
             var packetIn = ws.lastJsonMessage;
             console.log(packetIn);
@@ -45,15 +46,31 @@ const App = () => {
                 setNameApproved(true);
                 setWaiting(true);
             } else if (packetIn.action == ACTION.SEND_QUESTION) {
-				// receive T/F question
 				setWaiting(false);
 				setDisplayQuestion(true);
 				setQuestion(packetIn.payload);
 			}
         }
-    }, [ws.lastMessage]);
+    }, [ws.lastJsonMessage]);
 
-    var content = <Text>Starting...</Text>
+	const submitAnswer = (answer, teamName) => {
+		// code to submit answer to game master
+		var packet = {
+			to: DESTINATION.GAME_MASTER,
+			from: ORIGIN.PLAYER,
+			type: ACTION.SEND_ANSWER,
+			payload: {
+				teamName: teamName,
+				answer: answer
+			}
+		}
+		ws.sendJsonMessage(packet);
+		setDisplayQuestion(false);
+		console.log("Answer Sent:",answer);
+	}
+
+
+    var content = <Text></Text>
     if (!nameApproved) {
         content = <SignIn
             ws={ws}
@@ -63,8 +80,10 @@ const App = () => {
     } else if (waiting) {
 		content = <Waiting message="Waiting..."/>
 	} else if (displayQuestion) {
-		content = <Question question={question} teamName={teamName} socket={ws} />
+		content = <Question question={question} teamName={teamName} socket={ws} submitAnswer={submitAnswer}/>
 	}
+
+
 
     return (
         <View style={styles.mainScreen}>
@@ -76,11 +95,7 @@ const App = () => {
             <View style={styles.content}>
 				{content}
             </View>
-            <View style={styles.status}>
-                <Text style={styles.statusText}>{ws.lastMessage
-                        ? ws.lastMessage.data
-                        : ""}</Text>
-            </View>
+
         </View>
     );
 }

@@ -5647,6 +5647,11 @@ react-is@^16.13.1:
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
+react-native-a-beep@^1.2.0:
+  version "1.2.0"
+  resolved "https://registry.yarnpkg.com/react-native-a-beep/-/react-native-a-beep-1.2.0.tgz#387bb13770e9a67345270206d5ce4e0fc1df160d"
+  integrity sha512-tDPySYIVIg3cfRL/Hx+4iAngMdMiHPofpnUbyxnncshjC4UWrwMdASx2hcDQe1GEqIHfI0tm/GrCG4bT1L0O1w==
+
 react-native-bottom-bar@^0.3.3:
   version "0.3.3"
   resolved "https://registry.yarnpkg.com/react-native-bottom-bar/-/react-native-bottom-bar-0.3.3.tgz#095ffdd3517244ed512bb4d1b1c9689966c90c72"
@@ -5661,6 +5666,11 @@ react-native-codegen@^0.0.17:
     flow-parser "^0.121.0"
     jscodeshift "^0.13.1"
     nullthrows "^1.1.1"
+
+react-native-countdown-circle-timer@^3.0.9:
+  version "3.0.9"
+  resolved "https://registry.yarnpkg.com/react-native-countdown-circle-timer/-/react-native-countdown-circle-timer-3.0.9.tgz#ef16c9301197922669bc3afa498d5a1218e59aa9"
+  integrity sha512-7djFk+2QQS9FAhfIUhwQoc+P/7Vkn9EJApr6zUWK9B5QvHP07UlqIWfhIPqqeMa4kP6y5Y2S3YL+xeRsq2tNfg==
 
 react-native-dynamic-vector-icons@^1.2.0:
   version "1.2.0"
