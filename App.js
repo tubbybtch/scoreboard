@@ -78,7 +78,7 @@ const App = () => {
         }
     }, [ws.lastJsonMessage]);
 
-	const submitAnswer = (answer, teamName) => {
+	const submitAnswer = (answer, teamName, elapsed) => {
 		// code to submit answer to game master
 		var packet = {
 			to: DESTINATION.GAME_MASTER,
@@ -86,7 +86,8 @@ const App = () => {
 			type: ACTION.SEND_ANSWER,
 			payload: {
 				teamName: teamName,
-				answer: answer
+				answer: answer,
+				elapsedTime: elapsed
 			}
 		}
 		ws.sendJsonMessage(packet);

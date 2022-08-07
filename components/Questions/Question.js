@@ -16,17 +16,18 @@ const Question = (props) => {
         setAnswer] = useState(null);
     const [questionComplete,
         setQuestionComplete] = useState(false);
+	const [startTime,
+		setStartTime] = useState(Date.now());
 
-	// useEffect(() => {
-	// 	console.log("Vibrate");
-	// 	Vibration.vibrate(1000);
-	// 	RNBeep.beep();
-	// },[])
-
+	useEffect(() => {
+		console.log("Vibrate");
+		Vibration.vibrate(1000);
+		//RNBeep.beep();
+	},[])
 
     const submitAnswer = (answer) => {
         setAnswer(answer);
-        props.submitAnswer(answer, props.teamName);
+        props.submitAnswer(answer, props.teamName, Date.now()-startTime);
     }
 
     var content = null;
