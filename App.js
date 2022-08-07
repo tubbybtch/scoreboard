@@ -4,7 +4,10 @@ import {useWebSocket} from 'react-use-websocket/dist/lib/use-websocket.js';
 
 import SignIn from "./components/SignIn.js";
 import Waiting from './components/Waiting.js';
-import Question from "./components/Questions/Question.js"
+import Question from "./components/Questions/Question.js";
+import Grade from './components/Grades/Grade.js';
+import Scoresheet from './components/Scoresheets/Scoresheet.js';
+
 import {ACTION, DESTINATION, ORIGIN, ROLE, QUESTION_TYPE} from './tridget_constants.js';
 //import {ACTION, DESTINATION, ORIGIN, ROLE, QUESTION_TYPE} from 'https://github.com/tubbybtch/tridget2_constants/blob/48d97c4438aae2b451e0381a75d59f81af9d9236/tridget_constants.js';
 
@@ -16,13 +19,23 @@ const App = () => {
     const [teamName,
         setTeamName] = useState("Brainiacs"); 
     const [nameApproved,
-        setNameApproved] = useState(true);
+        setNameApproved] = useState(false);
     const [waiting,
         setWaiting] = useState(true);
 	const [displayQuestion,
 		setDisplayQuestion] = useState(false);
+	const [displayGrade,
+		setDisplayGrade] = useState(false);
+	const [displayScoresheet,
+		setDisplayScoresheet] = useState(false);
 	const [question,
 		setQuestion] = useState({});
+	const [grade,
+		setGrade] = useState({});
+	const [scoresheetData,
+		setScoresheetData] = useState({});
+	const [lastMessage,
+			setLastMessage] = useState("");
 
     const ws = useWebSocket(socketUrl, {
         onOpen: () => {
@@ -40,6 +53,10 @@ const App = () => {
 		console.log(ws.lastJsonMessage);
         if (ws.lastJsonMessage) {
             var packetIn = ws.lastJsonMessage;
+			setWaiting(false);
+			setDisplayGrade(false);
+			setDisplayQuestion(false);
+			setDisplayScoresheet(false);
             console.log(packetIn);
             if (packetIn.action == ACTION.CONFIRM_NAME) {
                 setTeamName(packetIn.payload.confirmedName);
@@ -49,6 +66,14 @@ const App = () => {
 				setWaiting(false);
 				setDisplayQuestion(true);
 				setQuestion(packetIn.payload);
+			} else if (packetIn.action == ACTION.GRADE_SENT) {
+				setDisplayGrade(true);
+				setGrade(packetIn.payload);
+			} else if (packetIn.action == ACTION.SEND_MESSAGE) {
+				setLastMessage(packetIn.payload.message);
+			} else if (packetIn.action == ACTION.SEND_TEAM_SCORESHEET) {
+				setScoresheetData(packetIn.payload.scoresheet);
+				setDisplayScoresheet(true);
 			}
         }
     }, [ws.lastJsonMessage]);
@@ -81,9 +106,12 @@ const App = () => {
 		content = <Waiting message="Waiting..."/>
 	} else if (displayQuestion) {
 		content = <Question question={question} teamName={teamName} socket={ws} submitAnswer={submitAnswer}/>
+	} else if (displayGrade) {
+		content = <Grade grade={grade} teamName={teamName} socket={ws} />
+	} else if (displayScoresheet) {
+		content = <Scoresheet scoresheet={scoresheetData} />
+
 	}
-
-
 
     return (
         <View style={styles.mainScreen}>
@@ -95,7 +123,9 @@ const App = () => {
             <View style={styles.content}>
 				{content}
             </View>
-
+			<View style={styles.status}>
+				<Text style={styles.statusText}>{lastMessage}</Text>
+			</View>
         </View>
     );
 }
@@ -115,12 +145,12 @@ const styles = StyleSheet.create({
         alignItems: "center"
     },
     status: {
-        flex: 2,
-        backgroundColor: "grey"
+        flex: 1,
+        backgroundColor: "#444"
     },
     statusText: {
         color: "white",
-        fontSize: 25
+        fontSize: 24
     },
     nameText: {
         color: "white",
