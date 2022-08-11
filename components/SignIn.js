@@ -7,64 +7,84 @@ import {
     Button,
     StyleSheet,
     ActivityIndicator,
-	Alert
+    Alert
 } from 'react-native';
 import {useWebSocket} from 'react-use-websocket/dist/lib/use-websocket';
-import  {ACTION, DESTINATION, ORIGIN, ROLE} from "../tridget_constants.js";
+import {ACTION, DESTINATION, ORIGIN, ROLE} from "../tridget_constants.js";
+
+const playerStates = {
+	WAITING: 0,
+
+	ENTERING_NAME: 1,
+	NAME_REVIEW: 2,
+	NAME_ACCEPTED: 3,
+
+	ANSWERING_QUESTION: 20,
+	ANSWER_SUBMITTED: 21,
+	RECIEVE_GRADE: 25,
+
+	RECEIVE_SCORESHEET: 30,
+}
+
 
 const SignIn = (props) => {
+    useEffect(() => {
+        var packet = props.ws.lastJsonMessage;
+        if (!packet) {
+            return;
+        }
+        if (packet.action == ACTION.CONFIRM_NAME) {
+            console.log(packet.payload.confirmedName, "confirmed");
+            // props
+            //     .ws
+            //     .setNameApproved(true);
+			props.setGameState(playerStates.NAME_ACCEPTED);
 
+        }
+    }, [props.lastJsonMessage]);
 
-	useEffect(() => {
-		var packet = props.ws.lastJsonMessage;
-		if (!packet) {
-			return;
-		}
-		if (packet.action == ACTION.CONFIRM_NAME) {
-			console.log(packet.payload.confirmedName, "confirmed");
-			props.ws.setNameApproved(true);
+    const submitHandler = () => {
+        if (props.teamName.trim().length == 0) {
+            Alert.alert("Name must be entered...");
 
-		}
-	},[props.lastJsonMessage]);
-
-	const submitHandler = () => {
-		if (props.teamName.trim().length == 0) {
-			Alert.alert("Name must be entered...");
-			
-			return;
-		}
-		var askPacket = {
-			to: DESTINATION.GAME_MASTER,
-			from: ORIGIN.PLAYER,
-			action: ACTION.ENTER_GAME,
-			payload: {
-				proposedName: props.teamName
-			}
-		}
-		console.log(askPacket);
-		props.ws.sendMessage(JSON.stringify(askPacket));
-	};
+            return;
+        }
+        var askPacket = {
+            to: DESTINATION.GAME_MASTER,
+            from: ORIGIN.PLAYER,
+            action: ACTION.ENTER_GAME,
+            payload: {
+                proposedName: props.teamName
+            }
+        }
+        console.log(askPacket);
+        props
+            .ws
+            .sendMessage(JSON.stringify(askPacket));
+		// props.setNameUnderReview(true);
+		props.setGameState(playerStates.NAME_REVIEW);
+    };
 
     return (
         <View
             style={{
-			height: window.height,
-			width: window.width,
+            height: window.height,
+            width: window.width,
             justifyContent: "space-between",
-            paddingTop: 20, 
+            paddingTop: 20
         }}>
             <View style={styles.title}>
                 <Text style={styles.titleText}>Brainy·App</Text>
             </View>
             <View style={styles.image}>
                 <Image
-					color="white"
+                    color="white"
                     source={{
                     uri: require('../assets/cellphone.png')
                 }}
                     style={{
                     height: 0,
-                    width: 0,
+                    width: 0
                 }}/>
             </View>
             <View
@@ -72,13 +92,19 @@ const SignIn = (props) => {
                 flex: 1,
                 alignItems: "center"
             }}>
-                <TextInput style={styles.inputBox}  onChangeText={newText => props.setTeamName(newText)}/>
+                <TextInput
+                    style={styles.inputBox}
+                    onChangeText={newText => props.setTeamName(newText)}/>
                 <Text style={styles.promptText}>Enter Team Name</Text>
             </View>
             <View style={styles.promptView}>
-                <br/><Button title="Submit" style="styles.submitButton" color="#444" onPress={submitHandler}/>
+                <br/><Button
+                    title="Submit"
+                    style="styles.submitButton"
+                    color="#444"
+                    onPress={submitHandler}/>
             </View>
-         </View>
+        </View>
     );
 }
 
@@ -100,12 +126,12 @@ const styles = StyleSheet.create({
     },
     image: {
         flex: 0,
-		alignItems: "center",
-		padding: 25
+        alignItems: "center",
+        padding: 25
     },
     promptView: {
         flex: 1,
-		paddingTop: 75,
+        paddingTop: 75
     },
     promptText: {
         color: "white",
@@ -124,32 +150,30 @@ const styles = StyleSheet.create({
     },
     submitButton: {
         fontSize: "40px",
-		padding: 50
+        padding: 50
     },
     connectionMessageView: {
         flex: .4,
         backgroundColor: "white",
-		alignItems: "center"
+        alignItems: "center"
     },
-	connectionMessage: {
-		fontSize: "25px",
-	},
-	status: {
-		flex: 3,
-		backgroundColor: "grey",
-	},
-	statusText: {
-		color: "white",
-		fontSize: 25
-	},
-	submitButtonView: {
-		paddingTop: 70,
-	}
+    connectionMessage: {
+        fontSize: "25px"
+    },
+    status: {
+        flex: 3,
+        backgroundColor: "grey"
+    },
+    statusText: {
+        color: "white",
+        fontSize: 25
+    },
+    submitButtonView: {
+        paddingTop: 70
+    }
 });
 
-// const ACTION_ENTER_GAME = 0;
-// const ROLE_PLAYER = 0;
-// const ORIGIN_PLAYER = 2;
+// const ACTION_ENTER_GAME = 0; const ROLE_PLAYER = 0; const ORIGIN_PLAYER = 2;
 // const DESTINATION_GAME_MASTER = 3;
 
 export default SignIn;

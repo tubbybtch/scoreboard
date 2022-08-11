@@ -3,13 +3,16 @@ import {ScrollView, StyleSheet, View, Text, useWindowDimensions} from 'react-nat
 import {useWebSocket} from 'react-use-websocket/dist/lib/use-websocket.js';
 
 import SignIn from "./components/SignIn.js";
+import NameReview from './components/NameReview.js';
 import Waiting from './components/Waiting.js';
 import Question from "./components/Questions/Question.js";
 import Grade from './components/Grades/Grade.js';
 import Scoresheet from './components/Scoresheets/Scoresheet.js';
 
+
 import {ACTION, DESTINATION, ORIGIN, ROLE, QUESTION_TYPE} from './tridget_constants.js';
-//import {ACTION, DESTINATION, ORIGIN, ROLE, QUESTION_TYPE} from 'https://github.com/tubbybtch/tridget2_constants/blob/48d97c4438aae2b451e0381a75d59f81af9d9236/tridget_constants.js';
+import {PLAYER_STATES} from "./player_constants";
+import AnswerSubmitted from './components/AnswerSubmitted.js';
 
 const socketUrl = "ws://192.168.0.167:10437";
 
@@ -17,17 +20,11 @@ const App = () => {
     const [connected,
         setConnected] = useState(false);
     const [teamName,
-        setTeamName] = useState("Brainiacs"); 
-    const [nameApproved,
-        setNameApproved] = useState(false);
-    const [waiting,
-        setWaiting] = useState(true);
+        setTeamName] = useState("Brainiacs");
+	const [gameState,
+		setGameState] = useState(PLAYER_STATES.ENTERING_NAME);
 	const [displayQuestion,
 		setDisplayQuestion] = useState(false);
-	const [displayGrade,
-		setDisplayGrade] = useState(false);
-	const [displayScoresheet,
-		setDisplayScoresheet] = useState(false);
 	const [question,
 		setQuestion] = useState({});
 	const [grade,
@@ -35,7 +32,7 @@ const App = () => {
 	const [scoresheetData,
 		setScoresheetData] = useState({});
 	const [lastMessage,
-			setLastMessage] = useState("");
+		setLastMessage] = useState("");
 
     const ws = useWebSocket(socketUrl, {
         onOpen: () => {
@@ -53,27 +50,26 @@ const App = () => {
 		console.log(ws.lastJsonMessage);
         if (ws.lastJsonMessage) {
             var packetIn = ws.lastJsonMessage;
-			setWaiting(false);
-			setDisplayGrade(false);
-			setDisplayQuestion(false);
-			setDisplayScoresheet(false);
             console.log(packetIn);
+
             if (packetIn.action == ACTION.CONFIRM_NAME) {
                 setTeamName(packetIn.payload.confirmedName);
-                setNameApproved(true);
-                setWaiting(true);
+				setGameState(PLAYER_STATES.WAITING);
+            } else if (packetIn.action == ACTION.DENY_NAME) {
+				console.log("name deny");
+                setTeamName("");
+				setGameState(PLAYER_STATES.ENTERING_NAME);
             } else if (packetIn.action == ACTION.SEND_QUESTION) {
-				setWaiting(false);
-				setDisplayQuestion(true);
 				setQuestion(packetIn.payload);
+				setGameState(PLAYER_STATES.ANSWERING_QUESTION);
 			} else if (packetIn.action == ACTION.GRADE_SENT) {
-				setDisplayGrade(true);
 				setGrade(packetIn.payload);
+				setGameState(PLAYER_STATES.RECIEVE_GRADE);
 			} else if (packetIn.action == ACTION.SEND_MESSAGE) {
 				setLastMessage(packetIn.payload.message);
 			} else if (packetIn.action == ACTION.SEND_TEAM_SCORESHEET) {
 				setScoresheetData(packetIn.payload.scoresheet);
-				setDisplayScoresheet(true);
+				setGameState(PLAYER_STATES.RECEIVE_SCORESHEET);
 			}
         }
     }, [ws.lastJsonMessage]);
@@ -91,25 +87,33 @@ const App = () => {
 			}
 		}
 		ws.sendJsonMessage(packet);
-		setDisplayQuestion(false);
 		console.log("Answer Sent:",answer);
+		setGameState(PLAYER_STATES.ANSWER_SUBMITTED);
 	}
 
 
     var content = <Text></Text>
-    if (!nameApproved) {
+	console.log(gameState);
+	if (gameState == PLAYER_STATES.ENTERING_NAME) {
         content = <SignIn
             ws={ws}
             setTeamName={setTeamName}
             teamName={teamName}
-            setNameApproved={setNameApproved}/>
-    } else if (waiting) {
+			setGameState={setGameState}
+			gameState={gameState}
+			/>
+    } else if (gameState == PLAYER_STATES.NAME_REVIEW) {
+		console.log("review");
+		content = <NameReview />
+	} else if (gameState == PLAYER_STATES.ANSWER_SUBMITTED) {
+		content = <AnswerSubmitted message="Waiting..."/>
+	} else if (gameState == PLAYER_STATES.WAITING) {
 		content = <Waiting message="Waiting..."/>
-	} else if (displayQuestion) {
+	}else if (gameState == PLAYER_STATES.ANSWERING_QUESTION) {
 		content = <Question question={question} teamName={teamName} socket={ws} submitAnswer={submitAnswer}/>
-	} else if (displayGrade) {
-		content = <Grade grade={grade} teamName={teamName} socket={ws} />
-	} else if (displayScoresheet) {
+	} else if (gameState == PLAYER_STATES.RECIEVE_GRADE) {
+		content = <Grade grade={grade} question={question} teamName={teamName} socket={ws} />
+	} else if (gameState == PLAYER_STATES.RECEIVE_SCORESHEET) {
 		content = <Scoresheet scoresheet={scoresheetData} />
 
 	}
@@ -117,9 +121,7 @@ const App = () => {
     return (
         <View style={styles.mainScreen}>
             <View style={styles.header}>
-                {nameApproved
-                    ? <Text style={styles.nameText}>{teamName}</Text>
-                    : null}
+                <Text style={styles.nameText}>{teamName}</Text>
             </View>
             <View style={styles.content}>
 				{content}

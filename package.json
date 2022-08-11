@@ -23,6 +23,7 @@
     "react-native-bottom-bar": "^0.3.3",
     "react-native-countdown-circle-timer": "^3.0.9",
     "react-native-dynamic-vector-icons": "^1.2.0",
+    "react-native-emoji": "^1.8.0",
     "react-native-helpers": "^0.0.2",
     "react-native-linear-gradient": "^2.6.2",
     "react-native-svg": "^12.4.0",

@@ -8,6 +8,7 @@ import RNBeep from 'react-native-a-beep';
 import QuestionTF from './QuestionTF';
 import QuestionMC from './QuestionMC';
 import QuestionFillIn from './QuestionFillIn';
+import QuestionMultiSelect from './QuestionMultiSelect';
 import AnswerSubmitted from '../AnswerSubmitted';
 
 const Question = (props) => {
@@ -29,6 +30,10 @@ const Question = (props) => {
         setAnswer(answer);
         props.submitAnswer(answer, props.teamName, Date.now()-startTime);
     }
+	const timeRunsOut = () => {
+		console.log("time runs out");
+		submitAnswer(null);
+	}
 
     var content = null;
     if (questionComplete) {
@@ -51,18 +56,25 @@ const Question = (props) => {
             question={props.question}
             setAnswer={submitAnswer}
             setQuestionComplete={setQuestionComplete}/>
-    }
+    } else if (props.question.type == QUESTION_TYPE.MULTIPLE_SELECT) {
+		console.log(props.question.type, QUESTION_TYPE.MULTIPLE_SELECT);
+        content = <QuestionMultiSelect
+            {...props}
+            question={props.question}
+            setAnswer={submitAnswer}
+            setQuestionComplete={setQuestionComplete}/>
+    } 
 
     return (
         <View style={styles.mainScreen}>
-			{props.question.timeLimit !== 0 ?
+			{props.question.timeLimit !== 0 && !questionComplete ?
             <View style={styles.timerView}>
                 <Text style={styles.descriptionText}>Seconds </Text>
 				<CountdownCircleTimer
                     isPlaying
                     duration={props.question.timeLimit}
 					size={100}
-					onComplete={() => submitAnswer("Time Elapsed")}
+					onComplete={timeRunsOut}
                     colors={['#004777', '#F7B801', '#A30000', '#A30000']}
                     colorsTime={[60, 30, 10, 0]}>
                     {({remainingTime}) => <Text style={styles.countDownText}>{remainingTime}</Text>}
