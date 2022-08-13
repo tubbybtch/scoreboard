@@ -2,7 +2,7 @@ import React, {useState, useEffect} from 'react';
 import {ScrollView, StyleSheet, View, Text, useWindowDimensions} from 'react-native';
 import {useWebSocket} from 'react-use-websocket/dist/lib/use-websocket.js';
 
-import SignIn from "./components/SignIn.js";
+import Welcome from "./components/Welcome.js";
 import NameReview from './components/NameReview.js';
 import Waiting from './components/Waiting.js';
 import Question from "./components/Questions/Question.js";
@@ -11,18 +11,18 @@ import Scoresheet from './components/Scoresheets/Scoresheet.js';
 
 
 import {ACTION, DESTINATION, ORIGIN, ROLE, QUESTION_TYPE} from './tridget_constants.js';
-import {PLAYER_STATES} from "./player_constants";
+import {SCOREBOARD} from "./scoreboard_constants";
 import AnswerSubmitted from './components/AnswerSubmitted.js';
 
-const socketUrl = "ws://192.168.0.167:10437";
+const socketUrl = "ws://192.168.0.167:10441";
 
 const App = () => {
     const [connected,
         setConnected] = useState(false);
-    const [teamName,
-        setTeamName] = useState("Brainiacs");
-	const [gameState,
-		setGameState] = useState(PLAYER_STATES.ENTERING_NAME);
+	const [game,
+		setGame] = useState({});
+ 	const [gameState,
+		setGameState] = useState(SCOREBOARD.WAITING);
 	const [displayQuestion,
 		setDisplayQuestion] = useState(false);
 	const [question,
@@ -36,7 +36,7 @@ const App = () => {
 
     const ws = useWebSocket(socketUrl, {
         onOpen: () => {
-            console.log('opened');
+            //console.log('opened');
             setConnected(true)
         },
         //Will attempt to reconnect on all close events, such as server shutting down
@@ -50,11 +50,10 @@ const App = () => {
 		console.log(ws.lastJsonMessage);
         if (ws.lastJsonMessage) {
             var packetIn = ws.lastJsonMessage;
-            console.log(packetIn);
-
-            if (packetIn.action == ACTION.CONFIRM_NAME) {
-                setTeamName(packetIn.payload.confirmedName);
-				setGameState(PLAYER_STATES.WAITING);
+   
+            if (packetIn.action == ACTION.DISPLAY_WELCOME) {
+                setGame(packetIn.payload);
+				setGameState(SCOREBOARD.WELCOME);
             } else if (packetIn.action == ACTION.DENY_NAME) {
 				console.log("name deny");
                 setTeamName("");
@@ -87,33 +86,22 @@ const App = () => {
 			}
 		}
 		ws.sendJsonMessage(packet);
-		console.log("Answer Sent:",answer);
+		//console.log("Answer Sent:",answer);
 		setGameState(PLAYER_STATES.ANSWER_SUBMITTED);
 	}
 
 
     var content = <Text></Text>
-	console.log(gameState);
-	if (gameState == PLAYER_STATES.ENTERING_NAME) {
-        content = <SignIn
-            ws={ws}
-            setTeamName={setTeamName}
-            teamName={teamName}
-			setGameState={setGameState}
-			gameState={gameState}
-			/>
-    } else if (gameState == PLAYER_STATES.NAME_REVIEW) {
-		console.log("review");
-		content = <NameReview />
-	} else if (gameState == PLAYER_STATES.ANSWER_SUBMITTED) {
+	//console.log(gameState);
+	 if (gameState == SCOREBOARD.ANSWER_SUBMITTED) {
 		content = <AnswerSubmitted message="Waiting..."/>
-	} else if (gameState == PLAYER_STATES.WAITING) {
-		content = <Waiting message="Waiting..."/>
-	}else if (gameState == PLAYER_STATES.ANSWERING_QUESTION) {
+	} else if (gameState == SCOREBOARD.WELCOME) {
+		content = <Welcome game={game.location}/>
+	}else if (gameState == SCOREBOARD.ANSWERING_QUESTION) {
 		content = <Question question={question} teamName={teamName} socket={ws} submitAnswer={submitAnswer}/>
-	} else if (gameState == PLAYER_STATES.RECIEVE_GRADE) {
+	} else if (gameState == SCOREBOARD.RECIEVE_GRADE) {
 		content = <Grade grade={grade} question={question} teamName={teamName} socket={ws} />
-	} else if (gameState == PLAYER_STATES.RECEIVE_SCORESHEET) {
+	} else if (gameState == SCOREBOARD.RECEIVE_SCORESHEET) {
 		content = <Scoresheet scoresheet={scoresheetData} />
 
 	}
@@ -121,7 +109,7 @@ const App = () => {
     return (
         <View style={styles.mainScreen}>
             <View style={styles.header}>
-                <Text style={styles.nameText}>{teamName}</Text>
+                <Text style={styles.nameText}>Bar Name</Text>
             </View>
             <View style={styles.content}>
 				{content}
