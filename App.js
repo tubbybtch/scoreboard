@@ -34,8 +34,8 @@ const App = () => {
 	const [lastMessage,
 		setLastMessage] = useState("");
 
-		
-    const ws = useWebSocket(socketUrl, {
+
+    const ws =  useWebSocket(socketUrl, {
         onOpen: () => {
             //console.log('opened');
             setConnected(true)
