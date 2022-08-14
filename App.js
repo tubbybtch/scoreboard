@@ -9,7 +9,6 @@ import Question from "./components/Questions/Question.js";
 import Grade from './components/Grades/Grade.js';
 import Scoresheet from './components/Scoresheets/Scoresheet.js';
 
-
 import {ACTION, DESTINATION, ORIGIN, ROLE, QUESTION_TYPE} from './tridget_constants.js';
 import {SCOREBOARD} from "./scoreboard_constants";
 import AnswerSubmitted from './components/AnswerSubmitted.js';
