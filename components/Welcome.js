@@ -8,11 +8,19 @@ import {
 
 const Welcome = (props) => {
 	console.log(props);
+
+
     return (
         <View
             style={styles.mainScreen}>
             <View style={styles.title}>
                 <Text style={styles.titleText}>{props.game.location}</Text>
+			</View>
+			<View style={styles.title}>
+                <Text style={styles.titleText}>{props.game.date}</Text>
+			</View>
+			<View style={styles.title}>
+                <Text style={styles.titleText}>{props.game.time}</Text>
 			</View>
         </View>
     );
@@ -31,7 +39,7 @@ const styles = StyleSheet.create({
     titleText: {
         flex: 1,
         color: "white",
-        fontSize: "30px",
+        fontSize: "40px",
         fontWeight: "bold"
     },
 
