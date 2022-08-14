@@ -1,3 +1,4 @@
+// main app
 import React, {useState, useEffect} from 'react';
 import {ScrollView, StyleSheet, View, Text, useWindowDimensions} from 'react-native';
 import {useWebSocket} from 'react-use-websocket/dist/lib/use-websocket.js';
