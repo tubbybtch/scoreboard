@@ -15,59 +15,35 @@ const Question = (props) => {
     console.log(props);
     const [answer,
         setAnswer] = useState(null);
-    const [questionComplete,
-        setQuestionComplete] = useState(false);
-	const [startTime,
-		setStartTime] = useState(Date.now());
 
-	useEffect(() => {
-		console.log("Vibrate");
-		Vibration.vibrate(1000);
-		//RNBeep.beep();
-	},[])
-
-    const submitAnswer = (answer) => {
-        setAnswer(answer);
-        props.submitAnswer(answer, props.teamName, Date.now()-startTime);
-    }
 	const timeRunsOut = () => {
 		console.log("time runs out");
 		submitAnswer(null);
 	}
 
     var content = null;
-    if (questionComplete) {
-        content = <AnswerSubmitted {...props} answer={answer}/>
-    } else if (props.question.type == QUESTION_TYPE.TRUE_FALSE) {
+	if (props.question.type == QUESTION_TYPE.TRUE_FALSE) {
         content = <QuestionTF
             {...props}
-            question={props.question}
-            setAnswer={submitAnswer}
-            setQuestionComplete={setQuestionComplete}/>
+            question={props.question} />
     } else if (props.question.type == QUESTION_TYPE.MULTIPLE_CHOICE) {
         content = <QuestionMC
             {...props}
-            question={props.question}
-            setAnswer={submitAnswer}
-            setQuestionComplete={setQuestionComplete}/>
+            question={props.question} />
     } else if (props.question.type == QUESTION_TYPE.FILL_IN) {
         content = <QuestionFillIn
             {...props}
-            question={props.question}
-            setAnswer={submitAnswer}
-            setQuestionComplete={setQuestionComplete}/>
+            question={props.question}/>
     } else if (props.question.type == QUESTION_TYPE.MULTIPLE_SELECT) {
 		console.log(props.question.type, QUESTION_TYPE.MULTIPLE_SELECT);
         content = <QuestionMultiSelect
             {...props}
-            question={props.question}
-            setAnswer={submitAnswer}
-            setQuestionComplete={setQuestionComplete}/>
+            question={props.question} />
     } 
 
     return (
         <View style={styles.mainScreen}>
-			{props.question.timeLimit !== 0 && !questionComplete ?
+			{props.question.timeLimit > 0 ?
             <View style={styles.timerView}>
                 <Text style={styles.descriptionText}>Seconds </Text>
 				<CountdownCircleTimer

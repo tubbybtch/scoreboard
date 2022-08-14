@@ -19,21 +19,20 @@ const socketUrl = "ws://192.168.0.167:10441";
 const App = () => {
     const [connected,
         setConnected] = useState(false);
-	const [game,
-		setGame] = useState({});
- 	const [gameState,
-		setGameState] = useState(SCOREBOARD.WAITING);
-	const [displayQuestion,
-		setDisplayQuestion] = useState(false);
-	const [question,
-		setQuestion] = useState({});
-	const [grade,
-		setGrade] = useState({});
-	const [scoresheetData,
-		setScoresheetData] = useState({});
-	const [lastMessage,
-		setLastMessage] = useState("");
-
+    const [game,
+        setGame] = useState({location: "", date: "", time: ""});
+    const [gameState,
+        setGameState] = useState(SCOREBOARD.WAITING);
+    const [displayQuestion,
+        setDisplayQuestion] = useState(false);
+    const [question,
+        setQuestion] = useState({});
+    const [grade,
+        setGrade] = useState({});
+    const [scoresheetData,
+        setScoresheetData] = useState({});
+    const [lastMessage,
+        setLastMessage] = useState("");
 
     const ws = useWebSocket(socketUrl, {
         onOpen: () => {
@@ -48,64 +47,68 @@ const App = () => {
 
     useEffect(() => {
         // will execute on every new packet received
-		console.log(ws.lastJsonMessage);
+        console.log(ws.lastJsonMessage);
         if (ws.lastJsonMessage) {
             var packetIn = ws.lastJsonMessage;
-   
+
             if (packetIn.action == ACTION.DISPLAY_WELCOME) {
+				console.log(packetIn);
                 setGame(packetIn.payload);
-				setGameState(SCOREBOARD.WELCOME);
+                setGameState(SCOREBOARD.WELCOME);
             } else if (packetIn.action == ACTION.DENY_NAME) {
-				console.log("name deny");
+                console.log("name deny");
                 setTeamName("");
-				setGameState(PLAYER_STATES.ENTERING_NAME);
+                setGameState(PLAYER_STATES.ENTERING_NAME);
             } else if (packetIn.action == ACTION.SEND_QUESTION) {
-				setQuestion(packetIn.payload);
-				setGameState(PLAYER_STATES.ANSWERING_QUESTION);
-			} else if (packetIn.action == ACTION.GRADE_SENT) {
-				setGrade(packetIn.payload);
-				setGameState(PLAYER_STATES.RECIEVE_GRADE);
-			} else if (packetIn.action == ACTION.SEND_MESSAGE) {
-				setLastMessage(packetIn.payload.message);
-			} else if (packetIn.action == ACTION.SEND_TEAM_SCORESHEET) {
-				setScoresheetData(packetIn.payload.scoresheet);
-				setGameState(PLAYER_STATES.RECEIVE_SCORESHEET);
-			}
+                setQuestion(packetIn.payload);
+                setGameState(PLAYER_STATES.ANSWERING_QUESTION);
+            } else if (packetIn.action == ACTION.GRADE_SENT) {
+                setGrade(packetIn.payload);
+                setGameState(PLAYER_STATES.RECIEVE_GRADE);
+            } else if (packetIn.action == ACTION.SEND_MESSAGE) {
+                setLastMessage(packetIn.payload.message);
+            } else if (packetIn.action == ACTION.SEND_TEAM_SCORESHEET) {
+                setScoresheetData(packetIn.payload.scoresheet);
+                setGameState(PLAYER_STATES.RECEIVE_SCORESHEET);
+            }
         }
     }, [ws.lastJsonMessage]);
 
-	const submitAnswer = (answer, teamName, elapsed) => {
-		// code to submit answer to game master
-		var packet = {
-			to: DESTINATION.GAME_MASTER,
-			from: ORIGIN.PLAYER,
-			type: ACTION.SEND_ANSWER,
-			payload: {
-				teamName: teamName,
-				answer: answer,
-				elapsedTime: elapsed
-			}
-		}
-		ws.sendJsonMessage(packet);
-		//console.log("Answer Sent:",answer);
-		setGameState(PLAYER_STATES.ANSWER_SUBMITTED);
-	}
-
+    const submitAnswer = (answer, teamName, elapsed) => {
+        // code to submit answer to game master
+        var packet = {
+            to: DESTINATION.GAME_MASTER,
+            from: ORIGIN.PLAYER,
+            type: ACTION.SEND_ANSWER,
+            payload: {
+                teamName: teamName,
+                answer: answer,
+                elapsedTime: elapsed
+            }
+        }
+        ws.sendJsonMessage(packet);
+        //console.log("Answer Sent:",answer);
+        setGameState(PLAYER_STATES.ANSWER_SUBMITTED);
+    }
 
     var content = <Text></Text>
-	//console.log(gameState);
-	 if (gameState == SCOREBOARD.ANSWER_SUBMITTED) {
-		content = <AnswerSubmitted message="Waiting..."/>
-	} else if (gameState == SCOREBOARD.WELCOME) {
-		content = <Welcome game={game.location}/>
-	}else if (gameState == SCOREBOARD.ANSWERING_QUESTION) {
-		content = <Question question={question} teamName={teamName} socket={ws} submitAnswer={submitAnswer}/>
-	} else if (gameState == SCOREBOARD.RECIEVE_GRADE) {
-		content = <Grade grade={grade} question={question} teamName={teamName} socket={ws} />
-	} else if (gameState == SCOREBOARD.RECEIVE_SCORESHEET) {
-		content = <Scoresheet scoresheet={scoresheetData} />
+    console.log(game);
+	if (gameState == SCOREBOARD.WAITING) {
+        content = <Waiting message="Waiting..."/>
+    } else if (gameState == SCOREBOARD.WELCOME) {
+        content = <Welcome game={game}/>
+    } else if (gameState == SCOREBOARD.ANSWERING_QUESTION) {
+        content = <Question
+            question={question}
+            teamName={teamName}
+            socket={ws}
+            submitAnswer={submitAnswer}/>
+    } else if (gameState == SCOREBOARD.RECIEVE_GRADE) {
+        content = <Grade grade={grade} question={question} teamName={teamName} socket={ws}/>
+    } else if (gameState == SCOREBOARD.RECEIVE_SCORESHEET) {
+        content = <Scoresheet scoresheet={scoresheetData}/>
 
-	}
+    }
 
     return (
         <View style={styles.mainScreen}>
@@ -113,11 +116,11 @@ const App = () => {
                 <Text style={styles.nameText}>Bar Name</Text>
             </View>
             <View style={styles.content}>
-				{content}
+                {content}
             </View>
-			<View style={styles.status}>
-				<Text style={styles.statusText}>{lastMessage}</Text>
-			</View>
+            <View style={styles.status}>
+                <Text style={styles.statusText}>{lastMessage}</Text>
+            </View>
         </View>
     );
 }
