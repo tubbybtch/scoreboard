@@ -52,25 +52,15 @@ const App = () => {
             var packetIn = ws.lastJsonMessage;
 
             if (packetIn.action == ACTION.DISPLAY_WELCOME) {
-				console.log(packetIn);
                 setGame(packetIn.payload);
                 setGameState(SCOREBOARD.WELCOME);
-            } else if (packetIn.action == ACTION.DENY_NAME) {
-                console.log("name deny");
-                setTeamName("");
-                setGameState(PLAYER_STATES.ENTERING_NAME);
             } else if (packetIn.action == ACTION.SEND_QUESTION) {
                 setQuestion(packetIn.payload);
-                setGameState(PLAYER_STATES.ANSWERING_QUESTION);
-            } else if (packetIn.action == ACTION.GRADE_SENT) {
-                setGrade(packetIn.payload);
-                setGameState(PLAYER_STATES.RECIEVE_GRADE);
-            } else if (packetIn.action == ACTION.SEND_MESSAGE) {
-                setLastMessage(packetIn.payload.message);
-            } else if (packetIn.action == ACTION.SEND_TEAM_SCORESHEET) {
-                setScoresheetData(packetIn.payload.scoresheet);
-                setGameState(PLAYER_STATES.RECEIVE_SCORESHEET);
-            }
+                setGameState(SCOREBOARD.DISPLAY_QUESTION);
+            }  else if (packetIn.action == ACTION.SEND_GAME_SCORESHEET) {
+				setScoresheetData(packetIn.payload.scoresheet);
+				setGameState(SCOREBOARD.DISPLAY_SCORESHEET);
+			}
         }
     }, [ws.lastJsonMessage]);
 
@@ -97,29 +87,18 @@ const App = () => {
         content = <Waiting message="Waiting..."/>
     } else if (gameState == SCOREBOARD.WELCOME) {
         content = <Welcome game={game}/>
-    } else if (gameState == SCOREBOARD.ANSWERING_QUESTION) {
+    } else if (gameState == SCOREBOARD.DISPLAY_QUESTION) {
         content = <Question
-            question={question}
-            teamName={teamName}
-            socket={ws}
-            submitAnswer={submitAnswer}/>
-    } else if (gameState == SCOREBOARD.RECIEVE_GRADE) {
-        content = <Grade grade={grade} question={question} teamName={teamName} socket={ws}/>
-    } else if (gameState == SCOREBOARD.RECEIVE_SCORESHEET) {
-        content = <Scoresheet scoresheet={scoresheetData}/>
-
-    }
+            question={question} />
+    }  else if (gameState == SCOREBOARD.DISPLAY_SCORESHEET) {
+        content = <Scoresheet
+            scoresheet={scoresheetData} />
+    } 
 
     return (
         <View style={styles.mainScreen}>
-            <View style={styles.header}>
-                <Text style={styles.nameText}>Bar Name</Text>
-            </View>
             <View style={styles.content}>
                 {content}
-            </View>
-            <View style={styles.status}>
-                <Text style={styles.statusText}>{lastMessage}</Text>
             </View>
         </View>
     );
@@ -145,7 +124,7 @@ const styles = StyleSheet.create({
     },
     statusText: {
         color: "white",
-        fontSize: 24
+        fontSize: 40
     },
     nameText: {
         color: "white",

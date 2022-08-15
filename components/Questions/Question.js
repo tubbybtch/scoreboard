@@ -18,7 +18,6 @@ const Question = (props) => {
 
 	const timeRunsOut = () => {
 		console.log("time runs out");
-		submitAnswer(null);
 	}
 
     var content = null;
@@ -49,7 +48,7 @@ const Question = (props) => {
 				<CountdownCircleTimer
                     isPlaying
                     duration={props.question.timeLimit}
-					size={100}
+					size={150}
 					onComplete={timeRunsOut}
                     colors={['#004777', '#F7B801', '#A30000', '#A30000']}
                     colorsTime={[60, 30, 10, 0]}>
@@ -71,7 +70,7 @@ const styles = StyleSheet.create({
         justifyContent: "center"
     },
 	timerView: {
-		flex: 1,
+		height: 155,
 		flexDirection: "row",
 		justifyContent: "center",
 		alignItems: "center",

@@ -11,38 +11,10 @@ import RadioButtons from '../NativeComponents/RadioButtons';
 
 const QuestionFillIn = (props) => {
     console.log(props);
-    const [answer,
-        setAnswer] = useState(null);
-
-    const onSelect = (index, value) => {
-        setAnswer(value);
-    }
-
-    const submitAnswer = () => {
-        console.log("submitted:", answer);
-        setAnswer(("" + answer).toUpperCase());
-        props.setAnswer(("" + answer).toUpperCase());
-        props.setQuestionComplete(true);
-    }
-
-    if (!props.question.numberLinesInAnswer) 
-        props.question.numberLinesInAnswer = 1;
     
     return (
         <View style={styles.mainScreen}>
             <Text style={styles.messageText}>{props.question.prompt}</Text><br/>
-            <View style={styles.buttonContainer}>
-                <TextInput
-                    onChangeText={setAnswer}
-                    style={styles.inputBox}
-                    multiline={true}
-                    numberOfLines={props.question.numberLinesInAnswer}/>
-            </View>
-            <View style={styles.submitButtonView}>
-                {answer !== null
-                    ? <Button onPress={submitAnswer} title="Submit" color="black"/>
-                    : null}
-            </View>
         </View>
     );
 }
@@ -55,7 +27,7 @@ const styles = StyleSheet.create({
     },
     messageText: {
         color: "white",
-        fontSize: "30px",
+        fontSize: "50px",
         fontWeight: "bold",
         marginLeft: 20
     },
@@ -83,9 +55,7 @@ const styles = StyleSheet.create({
         width: "100%",
         align: "center"
     },
-	submitButtonView: {
-		paddingTop: 70,
-	}
+
 });
 
 export default QuestionFillIn;

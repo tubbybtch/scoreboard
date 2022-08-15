@@ -14,7 +14,7 @@ const QuestionMultiSelectItem = (props) => {
 
     return (
         <View style={styles.mainScreen}>
-			<Checkbox onPress={pressCheckbox}/><Text style={styles.text}> {props.text}</Text>
+			<Text style={styles.text}>• {props.text}</Text>
         </View>
     );
 }
@@ -28,8 +28,9 @@ const styles = StyleSheet.create({
     },
 	text: {
         color: "white",
-        fontSize: "20px",
-        marginLeft: 15
+        fontSize: "30px",
+        marginLeft: 15,
+		fontWeight: "bold"
     },
 });
 

@@ -3,21 +3,6 @@ import {View, Text, StyleSheet, Pressable, Button} from 'react-native';
 import RadioButtons from '../NativeComponents/RadioButtons';
 
 const QuestionMC = (props) => {
-
-    const [answer,
-        setAnswer] = useState(null);
-
-    const onSelect = (index, value) => {
-        setAnswer(value);
-    }
-
-	const submitAnswer = () => {
-		console.log("submitted:",answer);
-		setAnswer(answer);
-		props.setAnswer(answer);
-		props.setQuestionComplete(true);
-	}
-
 	var opts = [];
 	for (let option of props.question.choices) {
 		opts.push({text: option, value: option})
@@ -31,13 +16,8 @@ const QuestionMC = (props) => {
                 <RadioButtons
                     options={opts}
                 layout="column"
-				setAnswer={setAnswer}/>
+				setAnswer={() => {}}/>
             </View>
-			<View>
-				<br/><br/>
-				{answer !== null ? <Button onPress={submitAnswer} title="Submit" color="black" /> : null}
-			</View>
-
         </View>
     );
 }
@@ -46,29 +26,18 @@ const styles = StyleSheet.create({
     mainScreen: {
         flex: 1,
         justifyContent: "center",
-        alignItems: "center"
+        alignItems: "center",
+		padding: 20
     },
     messageText: {
         color: "white",
-        fontSize: "30px",
+        fontSize: "50px",
         fontWeight: "bold",
 		marginLeft: 15
     },
     buttonContainer: {
         flexDirection: "row"
     },
-    button: {
-        height: 50,
-        width: 150,
-        margin: 10,
-        backgroundColor: "white"
-    },
-    buttonText: {
-        color: "white",
-        fontSize: "30px",
-        fontWeight: "bold",
-        justifyContent: "center"
-    }
 });
 
 export default QuestionMC;
